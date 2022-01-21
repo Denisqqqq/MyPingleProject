@@ -25,22 +25,46 @@ AMyActorTransportCube::AMyActorTransportCube()
 void AMyActorTransportCube::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SetActorLocation(StartPoint->GetActorLocation());
+	bMovedToEnd = true;
+
+	StartToEnd = EndPoint->GetActorLocation() - StartPoint->GetActorLocation();
+	StartToEnd.Normalize();
+
+	EndToStart = StartPoint->GetActorLocation() - EndPoint->GetActorLocation();
+	EndToStart.Normalize();
 }
 
 // Called every frame
 void AMyActorTransportCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector NewLocation = GetActorLocation();
-	FRotator NewRotation = GetActorRotation();
-	float RunningTime = GetGameTimeSinceCreation();
-	float DeltaDistanse = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
-	NewLocation.Y += DeltaDistanse * 3000.0f;       //Scale our height by a factor of 20
-	float DeltaRotation = DeltaTime * 0.0f;    //Rotate by 20 degrees per second
-	NewRotation.Yaw += DeltaRotation;
-	SetActorLocationAndRotation(NewLocation, NewRotation);
 
-	NewLocation.Y += DeltaRotation;     //Scale our height by FloatSpeed
+	FVector DestPoint;
+	FVector MoveVec;
+	if (bMovedToEnd)
+	{
+		DestPoint = EndPoint->GetActorLocation();
+		MoveVec = StartToEnd;
+	}
+	else
+	{
+		DestPoint = StartPoint->GetActorLocation();
+		MoveVec = EndToStart;
+	}
+
+	FVector CurrentLoc = GetActorLocation();
+
+	float Distance = FVector(DestPoint - CurrentLoc).SizeSquared();
+	if (Distance <= ((Speed * Speed) * DeltaTime))
+	{
+		SetActorLocation(DestPoint);
+		bMovedToEnd = !bMovedToEnd;
+	}
+	else
+	{
+		SetActorLocation(CurrentLoc + ((MoveVec * Speed) * DeltaTime));
+	}
 }
 

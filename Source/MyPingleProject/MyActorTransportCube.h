@@ -13,6 +13,15 @@ class MYPINGLEPROJECT_API AMyActorTransportCube : public AActor
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* VisualMesh;
+
+	UPROPERTY(EditAnyWhere)
+		float Speed = 100;
+
+	UPROPERTY(EditAnyWhere)
+		AActor* StartPoint;
+
+	UPROPERTY(EditAnyWhere)
+		AActor* EndPoint;
 public:	
 	// Sets default values for this actor's properties
 	AMyActorTransportCube();
@@ -20,6 +29,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	bool bMovedToEnd;
+
+	FVector StartToEnd;
+	FVector EndToStart;
 
 public:	
 	// Called every frame

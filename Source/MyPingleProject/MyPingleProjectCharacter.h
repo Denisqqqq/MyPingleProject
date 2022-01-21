@@ -53,6 +53,10 @@ public:
 
 	virtual void Jump() override;
 
+	void Death();
+
+	bool IsDead = false;
+
 protected:
 	virtual void BeginPlay();
 
@@ -106,11 +110,14 @@ protected:
 	void LookUpAtRate(float Rate);
 	/*ƒл€ редактировани€ промежутка времени с редактора*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WallRun", meta = (UImin = 0.0f , ClampMin = 0.0f))
-	float MaxWallRunTime = 1.0f;
+	float MaxWallRunTime = 0.3f;
 	
 	/*ƒл€ графика в зависимости угла наклона от времени с момента начала поворота*/ 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WallRun")
 	UCurveFloat* CameraTiltCurve;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WallRun")
+	UCurveFloat* CameraTippingCurve;
 
 protected:
 	// APawn interface
@@ -122,6 +129,7 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
 
 private:
 	//ѕринимает параметры на фход с FComponentsHitSignature
@@ -149,6 +157,11 @@ private:
 	FORCEINLINE void EndCameraTilt() {CameraTiltTimeline.Reverse();}
 	/*2 метода FORCEINLINE т.к методы выполн€ют одно действие и они не вызываютс€ но при компил€ции встал€ют кусочек кода*/
 
+	FORCEINLINE void BeginCameraTipping() { CameraTippingTimeline.Play(); }
+	UFUNCTION()
+	void UpdateCameraTipping(float Value);
+	UFUNCTION()
+	void DeathCameraTimelineEnd();
 
 	/*переменна€ что мы сейчас бежим по стене*/
 	bool IsWallRunning = false;
@@ -162,7 +175,6 @@ private:
 	/*—пециальна€ вспомогательна€ структура котора€ позвол€ет проигрывать кривую графика без разрывов значений(в зад вперед)все плавно*/
 	/*“ак же требует инклюд #include "Components/TimelineComponent.h"*/
 	FTimeline CameraTiltTimeline;
-
-
+	FTimeline CameraTippingTimeline;
 };
 

@@ -73,6 +73,7 @@ void AMyPingleProjectCharacter::Tick(float DeltaSeconds)
 	}
 	/*Сообщаем таймлайну что он должен тикать*/
 	CameraTiltTimeline.TickTimeline(DeltaSeconds);
+	CameraTippingTimeline.TickTimeline(DeltaSeconds);
 }
 	/*Переназначаем прыжок для отталкивания от стены во время бега по стене*/
 void AMyPingleProjectCharacter::Jump()
@@ -106,6 +107,12 @@ void AMyPingleProjectCharacter::Jump()
 	}
 }
 
+void AMyPingleProjectCharacter::Death()
+{
+	BeginCameraTipping();
+	//Destroy();
+} 
+
 void AMyPingleProjectCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -129,6 +136,18 @@ void AMyPingleProjectCharacter::BeginPlay()
 		TimelineCallBack.BindUFunction(this, FName("UpdateCameraTilt"));
 		/*К тайм лайну привязываем колбек и крувую по которой будут сменятся значения в зависимости от времени*/
 		CameraTiltTimeline.AddInterpFloat(CameraTiltCurve, TimelineCallBack);
+	}
+	if (IsValid(CameraTippingCurve))
+	{
+		/*Проверяем что выставлена наша кривая дальше нужно создать колбек для тайм лайна что бы вызвать нашу функцию апдейта*/
+		FOnTimelineFloat TimelineCallBackPitch;
+		/*привязывает к тайм лайну привязываем функцию через BindUFunction где первый аргумент указатель на тек.класс а второй имя функции в строковом формате */
+		TimelineCallBackPitch.BindUFunction(this, FName("UpdateCameraTipping"));
+		/*К тайм лайну привязываем колбек и крувую по которой будут сменятся значения в зависимости от времени*/
+		CameraTippingTimeline.AddInterpFloat(CameraTippingCurve, TimelineCallBackPitch);
+		FOnTimelineEvent FinishTimeline;
+		FinishTimeline.BindUFunction(this, FName("DeathCameraTimelineEnd"));
+		CameraTippingTimeline.SetTimelineFinishedFunc(FinishTimeline);
 	}
 }
 
@@ -324,6 +343,18 @@ void AMyPingleProjectCharacter::UpdateCameraTilt(float Value)
 	CurrentControlRotation.Roll = CurrentWallRunSide == EWallRunSide::Left ? Value : -Value;
 	/*И выставляет обновленное значение в камеру*/
 	GetController()->SetControlRotation(CurrentControlRotation);
+}
+
+void AMyPingleProjectCharacter::UpdateCameraTipping(float Value)
+{
+	FRotator CurrentControlPitch = GetControlRotation();
+	CurrentControlPitch.Pitch = Value;
+	GetController()->SetControlRotation(CurrentControlPitch);
+}
+
+void AMyPingleProjectCharacter::DeathCameraTimelineEnd()
+{
+	Destroy();
 }
 
 void AMyPingleProjectCharacter::OnFire()
