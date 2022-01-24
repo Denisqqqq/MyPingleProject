@@ -13,6 +13,8 @@ class AMyPingleProjectGameMode : public AGameModeBase
 
 public:
 	AMyPingleProjectGameMode();
+
+	void RespawnAfterDeath();
 };
 
 

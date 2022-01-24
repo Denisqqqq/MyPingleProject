@@ -4,6 +4,7 @@
 #include "MyPingleProjectHUD.h"
 #include "MyPingleProjectCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/GameModeBase.h"
 
 AMyPingleProjectGameMode::AMyPingleProjectGameMode()
 	: Super()
@@ -14,4 +15,13 @@ AMyPingleProjectGameMode::AMyPingleProjectGameMode()
 
 	// use our custom HUD class
 	HUDClass = AMyPingleProjectHUD::StaticClass();
+}
+
+void AMyPingleProjectGameMode::RespawnAfterDeath()
+{
+	bool IsDead = true;
+	if (IsDead)
+	{
+		RestartPlayer(GetWorld()->GetFirstPlayerController());
+	}
 }

@@ -13,6 +13,7 @@
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/TimelineComponent.h"
+#include "MyPingleProjectGameMode.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -285,6 +286,7 @@ void AMyPingleProjectCharacter::StopWallRun()
 	/*Отключаем*/
 	GetCharacterMovement()->SetPlaneConstraintEnabled(false);
 	GetCharacterMovement()->SetPlaneConstraintNormal(FVector::ZeroVector);
+
 }
 
 void AMyPingleProjectCharacter::UpdateWallrun()
@@ -350,11 +352,23 @@ void AMyPingleProjectCharacter::UpdateCameraTipping(float Value)
 	FRotator CurrentControlPitch = GetControlRotation();
 	CurrentControlPitch.Pitch = Value;
 	GetController()->SetControlRotation(CurrentControlPitch);
+	GetMovementComponent()->StopMovementImmediately();
 }
 
 void AMyPingleProjectCharacter::DeathCameraTimelineEnd()
 {
+	
 	Destroy();
+
+	UWorld* const pGameWorld = GetWorld();
+	if (pGameWorld)
+	{
+		AMyPingleProjectGameMode* const pGameMode = pGameWorld->GetAuthGameMode<AMyPingleProjectGameMode>();
+		if (pGameMode)
+		{
+			pGameMode->RestartPlayer(pGameWorld->GetFirstPlayerController());
+		}
+	}
 }
 
 void AMyPingleProjectCharacter::OnFire()
