@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <Components/StaticMeshComponent.h>
 #include "MyStepTrap.generated.h"
 
 UCLASS()
@@ -15,11 +16,20 @@ public:
 	// Sets default values for this actor's properties
 	AMyStepTrap();
 
-	UPROPERTY(EditAnywhere)
-		UStaticMeshComponent* VisualMesh;
+	UPROPERTY(VisibleAnywhere)
+		class USphereComponent* MyCollision;
 
+
+	UPROPERTY(VisibleAnywhere)
+		class UStaticMeshComponent* VisibleMesh;
+
+	float SphereRadius;
+	
 	UFUNCTION()
-		void OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	
+
 
 protected:
 	// Called when the game starts or when spawned

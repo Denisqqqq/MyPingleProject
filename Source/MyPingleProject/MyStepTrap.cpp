@@ -2,23 +2,25 @@
 
 
 #include "MyStepTrap.h"
+#include <Components/SphereComponent.h>
 
 // Sets default values
 AMyStepTrap::AMyStepTrap()
 {
-	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	VisualMesh->SetupAttachment(RootComponent);
-
-	OnActorBeginOverlap.AddDynamic(this, &AMyStepTrap::OnOverlapBegin);
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-}
+	SphereRadius = 200.0f;
 
-void AMyStepTrap::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
-{
-	AMyStepTrap* MyCharacter = Cast<AMyStepTrap>(OtherActor);
-	MyCharacter->Destroy();
+	MyCollision = CreateDefaultSubobject<USphereComponent>(TEXT("My Sphere Component"));
+	MyCollision->InitSphereRadius(SphereRadius);
+	RootComponent = MyCollision;
+
+	VisibleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("My Mesh"));
+	VisibleMesh->SetupAttachment(RootComponent);
+
+	MyCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyStepTrap::OnOverlapBegin);
+
+
 }
 
 // Called when the game starts or when spawned
@@ -33,5 +35,12 @@ void AMyStepTrap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+void AMyStepTrap::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	{
+		Destroy();
+	}
 }
 

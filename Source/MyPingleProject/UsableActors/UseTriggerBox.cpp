@@ -26,7 +26,7 @@ void AUseTriggerBox::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 	ACharacter* Character = Cast<ACharacter>(OtherActor);
 	if (Character != nullptr && ActorToUse)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("wall run started!"));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("TRIGGERed!"));
 		ActorToUse->UseActor(this);
 	}
 }
